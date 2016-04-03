@@ -90,15 +90,15 @@ class TrackedTaskList(Resource):
                 if task:
                     task_dict = literal_eval(task["task"])
                     task_dict["messageSet"] = t["message_set"]
-		    if t["message_set"]:
-			task_dict["message"] = t["message"]
+                    if t["message_set"]:
+                        task_dict["message"] = t["message"]
                     task_dict["trackingFriendId"] = t["tracking_friend"]
                     task_dict["trackedTaskId"] = t["tracked_task"]
                     tasks.append(task_dict)
-            ret_json_dict = {}
+            ret_json_dict = {"tasks": []}
             ind = 0
             for task in tasks:
-                ret_json_dict["task"+str(ind)] = task
+                ret_json_dict["tasks"].append(task)
                 ind += 1
             print ret_json_dict
             return jsonify(**ret_json_dict)
