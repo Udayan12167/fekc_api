@@ -90,6 +90,8 @@ class TrackedTaskList(Resource):
                 if task:
                     task_dict = literal_eval(task["task"])
                     task_dict["messageSet"] = t["message_set"]
+		    if t["message_set"]:
+			task_dict["message"] = t["message"]
                     task_dict["trackingFriendId"] = t["tracking_friend"]
                     task_dict["trackedTaskId"] = t["tracked_task"]
                     tasks.append(task_dict)
