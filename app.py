@@ -138,17 +138,17 @@ class Messages(Resource):
                 'tracking_friend': user["fbid"],
                 'tracked_task': args["task_id"]})
             a = list(messages)
-            message_dict = {}
+            message_dict = {"messages": []}
             ind = 0
             for message in a:
                 if str(message["message_set"]) == "1":
                     user_message_map = {'friendId': message["user_id"],
                                         'message': message["message"]}
-                    message_dict["message"+str(ind)] = user_message_map
+                    message_dict["messages"].append(user_message_map)
                 else:
                     user_message_map = {'friendId': message["user_id"],
                                         'message': "No message"}
-                    message_dict["message"+str(ind)] = user_message_map
+                    message_dict["messages"].append(user_message_map)
                 ind += 1
             return jsonify(**message_dict)
 
