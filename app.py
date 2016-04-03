@@ -91,7 +91,7 @@ class TrackedTaskList(Resource):
                     task_dict = literal_eval(task["task"])
                     task_dict["messageSet"] = t["message_set"]
                     task_dict["trackingFriendId"] = t["tracking_friend"]
-                    task_dict["tackedTaskId"] = t["tracked_task"]
+                    task_dict["trackedTaskId"] = t["tracked_task"]
                     tasks.append(task_dict)
             ret_json_dict = {}
             ind = 0
