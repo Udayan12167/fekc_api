@@ -134,10 +134,12 @@ class Messages(Resource):
         args = all_message_parser.parse_args()
         user = handle.users.find_one({'_id': ObjectId(user_id)})
         if user["fbtoken"] == args["fbtoken"]:
+            print "entered"
             messages = handle.tracked_tasks.find({
                 'tracking_friend': user["fbid"],
                 'tracked_task': args["task_id"]})
             a = list(messages)
+            print a
             message_dict = {"messages": []}
             ind = 0
             for message in a:
