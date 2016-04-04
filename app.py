@@ -178,7 +178,9 @@ class Tasks(Resource):
             handle.tracked_tasks.insert_one(task_entry)
             f = handle.users.find_one({'fbid': friend})
             if f:
-                gcm_client.send(f["gcmtoken"], literal_eval(args["task"]))
+                notification_dict = literal_eval(args["task"])
+                notification_dict["friendfbid"] = tracking_friend["fbid"]
+                gcm_client.send(f["gcmtoken"],"Task created",notification=notification_dict)
         return {'tid': str(task["_id"])}
 
 api.add_resource(UserList, '/users')
