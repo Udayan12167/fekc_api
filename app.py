@@ -180,8 +180,87 @@ class Tasks(Resource):
             if f:
                 notification_dict = literal_eval(args["task"])
                 notification_dict["friendfbid"] = tracking_friend["fbid"]
-                gcm_client.send(f["gcmtoken"],"Task created",notification=notification_dict)
+                gcm_client.send(f["gcmtoken"] ,"Task created" ,notification=notification_dict)
         return {'tid': str(task["_id"])}
+
+violation_parser = reqparse.RequestParser()
+violation_parser.add_argument('task_id')
+violation_parser.add_argument('user_id')
+violation_parser.add_argument('fbtoken')
+violation_parser.add_argument('timestamp')
+
+
+class Violation(Resource):
+    def post(self):
+        args = violation_parser.parse_args()
+        violation = {'user_id': args['user_id'],
+                     'task_id': args['task_id'],
+                     'timestamp': args['timestamp']}
+        user = handle.users.find_one({'_id': ObjectId(args["user_id"])})
+        if user["fbtoken"] == args["fbtoken"]:
+            handle.violations.insert_one(violation)
+            task = handle.tasks.find_one({'_id': ObjectId(args["task_id"])})
+            friend_list = literal_eval(task["task"])["friends"]
+            for friend in friends:
+                f = handle.users.find_one({'fbid': friend})
+                if f:
+                    notification_dict = literal_eval(task["task"])
+                    notification_dict["friendfbid"] = user["fbid"]
+                    gcm_client.send(f["gcmtoken"],
+                                    "Task violated",
+                                    notification=notification_dict)
+
+violation_list_parser = reqparse.RequestParser()
+violation_list_parser.add_argument('fbtoken')
+
+
+class TaskViolationList(Resource):
+    def get(self, task_id):
+        args = violation_list_parser.parse_args()
+        user = handle.users.find_one({'_id': ObjectId(args["user_id"])})
+        if user["fbtoken"] == args["fbtoken"]:
+            violations = handle.violations.find({'task_id': task_id})
+            v = list(violations)
+            violations_dict = {"violations": []}
+            for violation in v:
+                violations_dict["violations"].append(violation)
+            return jsonify(**violations_dict)
+
+
+winwin_parser = reqparse.RequestParser()
+winwin_parser.add_argument('task_id')
+winwin_parser.add_argument('user_id')
+winwin_parser.add_argument('fbtoken')
+winwin_parser.add_argument('timestamp')
+
+
+class WinWin(Resource):
+    def post(self):
+        args = winwin_parser.parse_args()
+        winwin = {'user_id': args['user_id'],
+                  'task_id': args['task_id'],
+                  'timestamp': args['timestamp']}
+        user = handle.users.find_one({'_id': ObjectId(args["user_id"])})
+        if user["fbtoken"] == args["fbtoken"]:
+            handle.winwin.insert_one(winwin)
+            return {'winwin': "success"}
+
+winwin_list_parser = reqparse.RequestParser()
+winwin_list_parser.add_argument('fbtoken')
+
+
+class TaskWinWinList(Resource):
+    def get(self, task_id):
+        args = winwin_list_parser.parse_args()
+        user = handle.users.find_one({'_id': ObjectId(args["user_id"])})
+        if user["fbtoken"] == args["fbtoken"]:
+            wins = handle.winwin.find({'task_id': task_id})
+            w = list(wins)
+            wins_dict = {"wins": []}
+            for win in w:
+                wins_dict["wins"].append(win)
+            return jsonify(**wins_dict)
+
 
 api.add_resource(UserList, '/users')
 api.add_resource(User, '/user/<user_id>')
@@ -189,6 +268,10 @@ api.add_resource(Tasks, '/tasks')
 api.add_resource(TrackedTaskList, "/tracked_tasks/<user_id>")
 api.add_resource(TrackedTaskMessage, "/message/<tracked_task_id>")
 api.add_resource(Messages, "/messages/<user_id>")
+api.add_resource(Violation, "/violation")
+api.add_resource(TaskViolationList, "/violations/<task_id>")
+api.add_resource(WinWin, "/win")
+api.add_resource(TaskWinWinList, "/wins/<task_id>")
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
