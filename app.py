@@ -183,6 +183,17 @@ class Tasks(Resource):
                 gcm_client.send(f["gcmtoken"] ,"Task created" ,notification=notification_dict)
         return {'tid': str(task["_id"])}
 
+
+class Task(Resource):
+    def delete(self, task_id):
+        violation_result = handle.violations.delete_many({'task_id': task_id})
+        win_result = handle.winwin.delete_many({'task_id': task_id})
+        tracked_result = handle.tracked_tasks.delete_many(
+            {'tracked_task': task_id})
+        task = handle.tasks.delete_many({'_id': ObjectId(task_id)})
+        return {"deleted": task.deleted_count}
+
+
 violation_parser = reqparse.RequestParser()
 violation_parser.add_argument('task_id')
 violation_parser.add_argument('user_id')
@@ -272,6 +283,7 @@ api.add_resource(Violation, "/violation")
 api.add_resource(TaskViolationList, "/violations/<task_id>")
 api.add_resource(WinWin, "/win")
 api.add_resource(TaskWinWinList, "/wins/<task_id>")
+api.add_resource(Task, '/task/<task_id>')
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
