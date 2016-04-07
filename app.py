@@ -220,6 +220,7 @@ class Violation(Resource):
                     gcm_client.send(f["gcmtoken"],
                                     "Task violated",
                                     notification=notification_dict)
+            return {'logged': "success"}
 
 violation_list_parser = reqparse.RequestParser()
 violation_list_parser.add_argument('fbtoken')
@@ -254,7 +255,7 @@ class WinWin(Resource):
         user = handle.users.find_one({'_id': ObjectId(args["user_id"])})
         if user["fbtoken"] == args["fbtoken"]:
             handle.winwin.insert_one(winwin)
-            return {'winwin': "success"}
+            return {'logged': "success"}
 
 winwin_list_parser = reqparse.RequestParser()
 winwin_list_parser.add_argument('fbtoken')
