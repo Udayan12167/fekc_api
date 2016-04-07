@@ -8,6 +8,7 @@ from pushjack import GCMClient
 from ast import literal_eval
 import json
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 api = Api(app)
@@ -206,7 +207,7 @@ class Violation(Resource):
         args = violation_parser.parse_args()
         violation = {'user_id': args['user_id'],
                      'task_id': args['task_id'],
-                     'timestamp': args['timestamp']}
+                     'timestamp': datetime.now()}
         user = handle.users.find_one({'_id': ObjectId(args["user_id"])})
         if user["fbtoken"] == args["fbtoken"]:
             handle.violations.insert_one(violation)
@@ -251,7 +252,7 @@ class WinWin(Resource):
         args = winwin_parser.parse_args()
         winwin = {'user_id': args['user_id'],
                   'task_id': args['task_id'],
-                  'timestamp': args['timestamp']}
+                  'timestamp': datetime.now()}
         user = handle.users.find_one({'_id': ObjectId(args["user_id"])})
         if user["fbtoken"] == args["fbtoken"]:
             handle.winwin.insert_one(winwin)
