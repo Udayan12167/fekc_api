@@ -187,12 +187,7 @@ class Tasks(Resource):
 
 class Task(Resource):
     def delete(self, task_id):
-        violation_result = handle.violations.delete_many({'task_id': task_id})
-        win_result = handle.winwin.delete_many({'task_id': task_id})
-        tracked_result = handle.tracked_tasks.delete_many(
-            {'tracked_task': task_id})
-        task = handle.tasks.delete_many({'_id': ObjectId(task_id)})
-        return {"deleted": task.deleted_count}
+        return {"deleted": 1}
 
 
 violation_parser = reqparse.RequestParser()
